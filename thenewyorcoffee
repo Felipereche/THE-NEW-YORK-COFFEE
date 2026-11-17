@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The New York Coffee® — It's Always Coffee Time</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js para experiência 3D interativa com a rolagem -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Google Fonts: Tipografia clássica, cursiva sutil e editorial fiel à referência e à marca TNYC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        espressoBg: '#120D0A',
+                        espressoCard: '#1B1410',
+                        espressoSurface: '#241B15',
+                        caramel: '#A67B5B',
+                        caramelLight: '#C89D7C',
+                        creamText: '#F5EFE6',
+                        mutedSand: '#B5A89B'
+                    },
+                    fontFamily: {
+                        editorial: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        condensed: ['"Oswald"', 'sans-serif'],
+                        sans: ['"Montserrat"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Paleta luxuosa dark-espresso inspirada na imagem de referência */
+        body {
+            background-color: #120D0A;
+            color: #F5EFE6;
+            background-image: 
+                radial-gradient(circle at 80% 12%, rgba(166, 123, 91, 0.14) 0%, transparent 45%),
+                radial-gradient(circle at 15% 55%, rgba(166, 123, 91, 0.08) 0%, transparent 50%);
+        }
+
+        /* Estilo editorial de linhas divisórias do menu */
+        .menu-header-border {
+            border-top: 1px solid rgba(166, 123, 91, 0.55);
+            border-bottom: 1px solid rgba(166, 123, 91, 0.25);
+        }
+
+        .menu-item-dots {
+            border-bottom: 1px dotted rgba(245, 239, 230, 0.18);
+        }
+
+        /* Barra de rolagem elegante */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #120D0A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #A67B5B;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-caramel selection:text-espressoBg relative">
+
+    <!-- Canvas 3D Fixo ao Fundo (reage suavemente à rolagem da tela com xícara e grãos de café) -->
+    <div id="three-scroll-container" class="fixed inset-0 pointer-events-none z-0 overflow-hidden opacity-90"></div>
+
+    <!-- Top Bar Discreta com Contatos e Status -->
+    <div class="relative z-10 bg-black/60 border-b border-caramel/20 text-mutedSand text-[11px] sm:text-xs py-2 px-4 tracking-widest uppercase">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="live-status-text">It's Always Coffee Time &bull; Alphaville &bull; ATC &bull; Perdizes</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="tel:+551141956222" class="hover:text-caramelLight transition">Alphaville: (11) 4195-6222</a>
+                <span class="hidden sm:inline text-caramel/40">|</span>
+                <a href="tel:+551138733379" class="hover:text-caramelLight transition">Perdizes: (11) 3873-3379</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cabeçalho Principal / Navegação -->
+    <header class="sticky top-0 z-40 bg-espressoBg/90 backdrop-blur-md border-b border-caramel/20 transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logotipo NYC Oficial Vetorizado fiel à marca -->
+                <a href="#inicio" class="flex items-center gap-3 group">
+                    <div class="relative flex items-center">
+                        <svg class="h-11 w-auto text-creamText transition-transform duration-300 group-hover:scale-105" viewBox="0 0 185 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 72V14H22L48 51V14H61V72H48L21 34V72H8Z" fill="currentColor"/>
+                            <path d="M56 32L74 58V84H87V58L105 32H90L80.5 47L71 32H56Z" fill="currentColor"/>
+                            <path d="M132 13C115 13 103 25 103 43C103 61 115 73 132 73C144 73 153 67 157 57L145 51C142 57 138 60 132 60C122 60 116 53 116 43C116 33 122 26 132 26C138 26 142 29 145 35L157 29C153 19 144 13 132 13Z" fill="currentColor"/>
+                        </svg>
+                        <div class="border-l border-caramel/40 pl-2.5 ml-1 leading-none">
+                            <span class="block font-condensed font-bold text-[11px] tracking-[0.22em] uppercase text-creamText">The</span>
+                            <span class="block font-condensed font-bold text-[11px] tracking-[0.22em] uppercase text-creamText">New</span>
+                            <span class="block font-condensed font-bold text-[11px] tracking-[0.22em] uppercase text-creamText">York</span>
+                            <span class="block font-condensed font-bold text-[11px] tracking-[0.22em] uppercase text-caramelLight">Coffee</span>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Links Desktop -->
+                <nav class="hidden md:flex items-center space-x-8 text-xs font-medium tracking-[0.16em] uppercase text-mutedSand">
+                    <a href="#inicio" class="hover:text-creamText transition py-2">Início</a>
+                    <a href="#sobre" class="hover:text-creamText transition py-2">Nossa História</a>
+                    <a href="#destaques" class="hover:text-creamText transition py-2">Destaques</a>
+                    <a href="#cardapio" class="text-creamText border-b border-caramel py-2">Cardápio Completo</a>
+                    <a href="#unidades" class="hover:text-creamText transition py-2">Unidades</a>
+                </nav>
+
+                <!-- Botões de Ação -->
+                <div class="flex items-center gap-2.5">
+                    <button onclick="openComandaModal()" class="relative bg-caramel text-espressoBg px-4 py-2.5 rounded-lg text-xs font-semibold tracking-wider uppercase hover:bg-caramelLight transition shadow-lg flex items-center gap-2">
+                        <span>Comanda</span>
+                        <span id="comanda-badge" class="bg-espressoBg text-creamText text-[10px] font-bold px-1.5 py-0.5 rounded-full">0</span>
+                    </button>
+                    <button id="mobile-menu-btn" aria-label="Abrir Menu" class="md:hidden p-2.5 rounded-lg border border-caramel/30 text-creamText hover:bg-caramel/20 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menu Mobile -->
+        <div id="mobile-menu" class="hidden md:hidden bg-espressoCard border-b border-caramel/20 px-4 pt-2 pb-5 space-y-2">
+            <a href="#inicio" class="block py-2.5 px-3 rounded-lg text-xs font-semibold tracking-widest uppercase hover:bg-espressoSurface">Início</a>
+            <a href="#sobre" class="block py-2.5 px-3 rounded-lg text-xs font-semibold tracking-widest uppercase hover:bg-espressoSurface">Nossa História</a>
+            <a href="#destaques" class="block py-2.5 px-3 rounded-lg text-xs font-semibold tracking-widest uppercase hover:bg-espressoSurface">Popular Picks</a>
+            <a href="#cardapio" class="block py-2.5 px-3 rounded-lg text-xs font-semibold tracking-widest uppercase bg-caramel text-espressoBg">Cardápio Oficial</a>
+            <a href="#unidades" class="block py-2.5 px-3 rounded-lg text-xs font-semibold tracking-widest uppercase hover:bg-espressoSurface">Unidades & Telefones</a>
+        </div>
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- SEÇÃO 1: HERO (ESTILO EDITORIAL DA IMAGEM DE REFERÊNCIA)              -->
+    <!-- ===================================================================== -->
+    <section id="inicio" class="relative z-10 py-16 sm:py-24 lg:py-28 border-b border-caramel/15 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Coluna Esquerda: Tipografia e Botões idênticos à referência -->
+                <div class="lg:col-span-6 space-y-6 text-center lg:text-left">
+                    <p class="font-editorial italic text-xl sm:text-2xl text-caramelLight tracking-wide">
+                        Rich. Smooth. Perfect.
+                    </p>
+                    
+                    <h1 class="font-editorial text-5xl sm:text-6xl lg:text-[68px] font-semibold tracking-tight leading-[1.03] text-creamText">
+                        Experience <br>
+                        Coffee Like <br>
+                        <span class="text-caramel font-normal">Never Before</span>
+                    </h1>
+                    
+                    <p class="text-xs sm:text-sm text-mutedSand max-w-md mx-auto lg:mx-0 leading-relaxed font-normal">
+                        Cafés artesanais feitos com os melhores grãos, preparados com perfeição para você. A atmosfera clássica de Nova York em Alphaville e Perdizes.
+                    </p>
+
+                    <!-- Botões Arredondados Estilo Referência -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
+                        <a href="#cardapio" class="w-full sm:w-auto px-7 py-3.5 bg-caramel text-espressoBg font-semibold text-xs tracking-wider uppercase rounded-lg hover:bg-caramelLight transition flex items-center justify-center gap-2 shadow-lg">
+                            <span>Explorar Cardápio</span>
+                            <span>&rarr;</span>
+                        </a>
+                        <a href="#sobre" class="w-full sm:w-auto px-7 py-3.5 border border-caramel/50 bg-espressoCard/60 text-creamText font-semibold text-xs tracking-wider uppercase rounded-lg hover:border-caramel hover:bg-espressoSurface transition flex items-center justify-center gap-2">
+                            <span>Nossa História</span>
+                            <span class="w-4 h-4 rounded-full border border-creamText/60 flex items-center justify-center text-[9px]">&#9654;</span>
+                        </a>
+                    </div>
+
+                    <!-- 3 Selos Inferiores da Referência -->
+                    <div class="pt-6 grid grid-cols-3 gap-4 max-w-md mx-auto lg:mx-0 border-t border-caramel/15 text-left">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full border border-caramel/40 flex items-center justify-center text-caramelLight shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                            </div>
+                            <div class="leading-tight">
+                                <span class="block text-[11px] font-semibold text-creamText">Grãos</span>
+                                <span class="block text-[10px] text-mutedSand">Selecionados</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full border border-caramel/40 flex items-center justify-center text-caramelLight shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/></svg>
+                            </div>
+                            <div class="leading-tight">
+                                <span class="block text-[11px] font-semibold text-creamText">Torra</span>
+                                <span class="block text-[10px] text-mutedSand">Artesanal</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full border border-caramel/40 flex items-center justify-center text-caramelLight shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                            </div>
+                            <div class="leading-tight">
+                                <span class="block text-[11px] font-semibold text-creamText">Feito Com</span>
+                                <span class="block text-[10px] text-mutedSand">Excelência</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coluna Direita: Palco Visual para a Xícara 3D & Destaque Fotográfico -->
+                <div class="lg:col-span-6 relative">
+                    <div class="relative rounded-2xl overflow-hidden border border-caramel/25 bg-gradient-to-br from-espressoCard/90 via-espressoBg/80 to-black/90 p-8 sm:p-10 shadow-2xl">
+                        <div class="aspect-[4/3] rounded-xl overflow-hidden relative flex items-center justify-center bg-black/40 border border-caramel/20">
+                            <img 
+                                src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1000&q=80" 
+                                alt="Latte Art Clássico The New York Coffee" 
+                                class="w-full h-full object-cover opacity-80 mix-blend-luminosity hover:scale-105 transition duration-700"
+                                onerror="this.src='https://placehold.co/800x600/1B1410/C89D7C?text=The+New+York+Coffee'"
+                            >
+                            <div class="absolute inset-0 bg-gradient-to-t from-espressoBg via-transparent to-espressoBg/40"></div>
+                            <div class="absolute bottom-5 left-5 right-5 flex items-center justify-between bg-espressoBg/85 backdrop-blur-md border border-caramel/30 px-4 py-3 rounded-xl">
+                                <div>
+                                    <span class="block font-condensed text-[10px] tracking-[0.25em] uppercase text-caramelLight">The New York Coffee®</span>
+                                    <span class="font-editorial text-lg font-semibold text-creamText">Signature Latte & All-Day Brunch</span>
+                                </div>
+                                <span class="text-xs font-condensed tracking-widest uppercase px-3 py-1 bg-caramel text-espressoBg rounded font-bold">NYC</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SEÇÃO 2: ABOUT US ("MORE THAN JUST A COFFEE" - IGUAL À REFERÊNCIA)    -->
+    <!-- ===================================================================== -->
+    <section id="sobre" class="relative z-10 py-16 sm:py-24 border-b border-caramel/15">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+                
+                <!-- Imagem Esquerda Estilo Cafeteria Aconchegante -->
+                <div class="lg:col-span-6">
+                    <div class="relative rounded-2xl overflow-hidden border border-caramel/25 shadow-2xl group">
+                        <img 
+                            src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1000&q=80" 
+                            alt="Ambiente The New York Coffee" 
+                            class="w-full h-[360px] sm:h-[430px] object-cover group-hover:scale-105 transition duration-700"
+                            onerror="this.src='https://placehold.co/800x600/1B1410/C89D7C?text=TNYC+Coffee+House'"
+                        >
+                        <div class="absolute inset-0 bg-gradient-to-tr from-espressoBg/90 via-espressoBg/20 to-transparent"></div>
+                        <div class="absolute bottom-6 left-6 bg-espressoBg/90 backdrop-blur-md border border-caramel/30 px-5 py-3.5 rounded-xl">
+                            <p class="font-condensed text-xs tracking-[0.22em] uppercase text-caramelLight">TNYC Market & Roastery</p>
+                            <p class="font-editorial text-xl text-creamText mt-0.5">Grãos Especiais & Panificação Própria</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Texto Direita "About Us / More Than Just a Coffee" -->
+                <div class="lg:col-span-6 space-y-5">
+                    <p class="font-editorial italic text-xl text-caramelLight">Sobre Nós</p>
+                    <h2 class="font-editorial text-4xl sm:text-5xl font-semibold text-creamText leading-tight">
+                        More Than Just <br>
+                        a <span class="text-caramel font-normal">Coffee</span>
+                    </h2>
+                    <p class="text-xs sm:text-sm text-mutedSand leading-relaxed">
+                        Na <strong>The New York Coffee®</strong>, acreditamos que o café é mais do que uma bebida — é uma experiência. Cada xícara que servimos é uma combinação de paixão, qualidade e perfeição, acompanhada pelo melhor do brunch nova-iorquino.
+                    </p>
+
+                    <ul class="space-y-3 pt-2 text-xs sm:text-sm text-creamText/90">
+                        <li class="flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full bg-caramel/20 border border-caramel/50 flex items-center justify-center text-caramelLight text-xs">&#10003;</span>
+                            <span>Grãos Especiais de Origem Selecionada</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full bg-caramel/20 border border-caramel/50 flex items-center justify-center text-caramelLight text-xs">&#10003;</span>
+                            <span>Fermentação Natural & Confeitaria Artesanal</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full bg-caramel/20 border border-caramel/50 flex items-center justify-center text-caramelLight text-xs">&#10003;</span>
+                            <span>Torra Fresca & Métodos Filtrados (Hario V60, Aeropress, Clever)</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <span class="w-6 h-6 rounded-full bg-caramel/20 border border-caramel/50 flex items-center justify-center text-caramelLight text-xs">&#10003;</span>
+                            <span>Preparado por Baristas Especialistas</span>
+                        </li>
+                    </ul>
+
+                    <div class="pt-3">
+                        <a href="#unidades" class="inline-flex items-center gap-2 px-6 py-3 bg-caramel text-espressoBg font-semibold text-xs tracking-wider uppercase rounded-lg hover:bg-caramelLight transition shadow-md">
+                            <span>Conhecer Unidades</span>
+                            <span>&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SEÇÃO 3: POPULAR PICKS (4 CARDS EM DESTAQUE IGUAIS À REFERÊNCIA)      -->
+    <!-- ===================================================================== -->
+    <section id="destaques" class="relative z-10 py-16 sm:py-20 border-b border-caramel/15">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-xl mx-auto mb-12 space-y-2">
+                <p class="font-editorial italic text-xl text-caramelLight">Our Signature</p>
+                <h2 class="font-editorial text-4xl sm:text-5xl font-semibold text-creamText">Popular Picks</h2>
+                <div class="w-12 h-[1px] bg-caramel mx-auto mt-3"></div>
+            </div>
+
+            <!-- Grid de 4 Cards Escuros Arredondados com Preço e Botão Carrinho -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Card 1 -->
+                <div class="bg-espressoCard/90 border border-caramel/25 rounded-2xl p-4 flex flex-col justify-between hover:border-caramel transition group shadow-lg">
+                    <div>
+                        <div class="aspect-square rounded-xl overflow-hidden mb-4 bg-black/50">
+                            <img src="https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=600&q=80" alt="Iced Caramel Latte" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/400x400/241B15/C89D7C?text=Iced+Latte'">
+                        </div>
+                        <h3 class="font-editorial text-xl font-semibold text-creamText">Iced Latte</h3>
+                        <p class="text-[11px] text-mutedSand mt-1 leading-relaxed">Espresso intenso com leite gelado e sabores Latte, Vanilla ou Caramel.</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-4 mt-4 border-t border-caramel/15">
+                        <span class="font-condensed text-lg font-bold text-creamText">R$16,90</span>
+                        <button onclick="addToComanda('Iced Latte', 16.90)" class="w-9 h-9 rounded-lg bg-espressoSurface border border-caramel/40 text-caramelLight hover:bg-caramel hover:text-espressoBg flex items-center justify-center transition" title="Adicionar à comanda">
+                            +
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-espressoCard/90 border border-caramel/25 rounded-2xl p-4 flex flex-col justify-between hover:border-caramel transition group shadow-lg">
+                    <div>
+                        <div class="aspect-square rounded-xl overflow-hidden mb-4 bg-black/50">
+                            <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=600&q=80" alt="Cappuccino" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/400x400/241B15/C89D7C?text=Cappuccino'">
+                        </div>
+                        <h3 class="font-editorial text-xl font-semibold text-creamText">Cappuccino</h3>
+                        <p class="text-[11px] text-mutedSand mt-1 leading-relaxed">Clássico café espresso preparado com leite vaporizado ultra cremoso.</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-4 mt-4 border-t border-caramel/15">
+                        <span class="font-condensed text-lg font-bold text-creamText">R$14,90</span>
+                        <button onclick="addToComanda('Cappuccino', 14.90)" class="w-9 h-9 rounded-lg bg-espressoSurface border border-caramel/40 text-caramelLight hover:bg-caramel hover:text-espressoBg flex items-center justify-center transition" title="Adicionar à comanda">
+                            +
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-espressoCard/90 border border-caramel/25 rounded-2xl p-4 flex flex-col justify-between hover:border-caramel transition group shadow-lg">
+                    <div>
+                        <div class="aspect-square rounded-xl overflow-hidden mb-4 bg-black/50">
+                            <img src="https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=600&q=80" alt="Moccha" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/400x400/241B15/C89D7C?text=Moccha'">
+                        </div>
+                        <h3 class="font-editorial text-xl font-semibold text-creamText">Moccha</h3>
+                        <p class="text-[11px] text-mutedSand mt-1 leading-relaxed">Espresso, leite vaporizado e ganache de chocolate belga ou Nutella.</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-4 mt-4 border-t border-caramel/15">
+                        <span class="font-condensed text-lg font-bold text-creamText">R$19,90</span>
+                        <button onclick="addToComanda('Moccha', 19.90)" class="w-9 h-9 rounded-lg bg-espressoSurface border border-caramel/40 text-caramelLight hover:bg-caramel hover:text-espressoBg flex items-center justify-center transition" title="Adicionar à comanda">
+                            +
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-espressoCard/90 border border-caramel/25 rounded-2xl p-4 flex flex-col justify-between hover:border-caramel transition group shadow-lg">
+                    <div>
+                        <div class="aspect-square rounded-xl overflow-hidden mb-4 bg-black/50">
+                            <img src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=600&q=80" alt="Espresso" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='https://placehold.co/400x400/241B15/C89D7C?text=Espresso'">
+                        </div>
+                        <h3 class="font-editorial text-xl font-semibold text-creamText">Espresso</h3>
+                        <p class="text-[11px] text-mutedSand mt-1 leading-relaxed">Extração encorpada, aromática e pura dos nossos grãos especiais.</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-4 mt-4 border-t border-caramel/15">
+                        <span class="font-condensed text-lg font-bold text-creamText">R$9,90</span>
+                        <button onclick="addToComanda('Espresso', 9.90)" class="w-9 h-9 rounded-lg bg-espressoSurface border border-caramel/40 text-caramelLight hover:bg-caramel hover:text-espressoBg flex items-center justify-center transition" title="Adicionar à comanda">
+                            +
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="text-center mt-10">
+                <a href="#cardapio" class="inline-flex items-center gap-2 px-6 py-2.5 border border-caramel/40 rounded-lg text-xs font-semibold tracking-wider uppercase text-creamText hover:bg-caramel hover:text-espressoBg transition">
+                    <span>Ver Cardápio Completo</span>
+                    <span>&rarr;</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SEÇÃO 4: CARDÁPIO OFICIAL COMPLETO E IDÊNTICO AO MENU IMPRESSO TNYC   -->
+    <!-- ===================================================================== -->
+    <section id="cardapio" class="relative z-10 py-16 sm:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Título Editorial do Cardápio -->
+            <div class="text-center max-w-3xl mx-auto mb-10 space-y-2">
+                <p class="font-editorial italic text-xl text-caramelLight">Official Menu</p>
+                <h2 class="font-editorial text-4xl sm:text-5xl font-semibold tracking-wide text-creamText">Cardápio The New York Coffee</h2>
+                <p class="text-xs sm:text-sm text-mutedSand">
+                    Todos os itens, descrições, adicionais e valores atualizados exatamente conforme nosso menu oficial. Clique em qualquer item para adicionar à sua comanda.
+                </p>
+            </div>
+
+            <!-- Barra de Busca e Filtro por Seção -->
+            <div class="sticky top-20 z-30 bg-espressoBg/95 backdrop-blur-md py-4 mb-10 border-y border-caramel/25">
+                <div class="flex flex-col md:flex-row gap-3 justify-between items-center">
+                    <div class="relative w-full md:w-80">
+                        <input 
+                            type="text" 
+                            id="menu-search" 
+                            placeholder="Buscar no cardápio (ex: Avocado, Latte, Red Velvet...)" 
+                            class="w-full pl-9 pr-4 py-2 bg-espressoCard border border-caramel/30 rounded-lg text-xs text-creamText focus:outline-none focus:border-caramel placeholder:text-mutedSand/60"
+                        >
+                        <svg class="w-4 h-4 text-caramelLight absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+                        <button data-filter="all" class="filter-btn active px-3 py-1.5 rounded-lg text-[11px] font-condensed tracking-wider uppercase bg-caramel text-espressoBg font-bold whitespace-nowrap transition">Todos</button>
+                        <button data-filter="cafes" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-condensed tracking-wider uppercase border border-caramel/30 text-creamText hover:bg-caramel/20 whitespace-nowrap transition">Cafés & Hot/Iced</button>
+                        <button data-filter="beverages" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-condensed tracking-wider uppercase border border-caramel/30 text-creamText hover:bg-caramel/20 whitespace-nowrap transition">Beverages & Cocktails</button>
+                        <button data-filter="sweets" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-condensed tracking-wider uppercase border border-caramel/30 text-creamText hover:bg-caramel/20 whitespace-nowrap transition">Sweets</button>
+                        <button data-filter="brunch" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-condensed tracking-wider uppercase border border-caramel/30 text-creamText hover:bg-caramel/20 whitespace-nowrap transition">TNYC Brunch</button>
+                        <button data-filter="bigdeal" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-condensed tracking-wider uppercase border border-caramel/30 text-creamText hover:bg-caramel/20 whitespace-nowrap transition">The Big Deal</button>
+                        <button data-filter="breads" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-condensed tracking-wider uppercase border border-caramel/30 text-creamText hover:bg-caramel/20 whitespace-nowrap transition">Breads & Savory</button>
+                        <button data-filter="desserts" class="filter-btn px-3 py-1.5 rounded-lg text-[11px] font-condensed tracking-wider uppercase border border-caramel/30 text-creamText hover:bg-caramel/20 whitespace-nowrap transition">Family Desserts & Market</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTAINER DO CARDÁPIO -->
+            <div id="menu-container" class="space-y-14">
+
+                <!-- PÁGINA 1 DO CARDÁPIO -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    <!-- COLUNA 1: CAFÉS, HOT & ICED -->
+                    <div class="lg:col-span-4 space-y-8 menu-category-block" data-category="cafes">
+                        <!-- CAFÉS -->
+                        <div class="bg-espressoCard/85 backdrop-blur-sm border border-caramel/20 p-6 rounded-2xl shadow-lg">
+                            <div class="menu-header-border py-2 mb-4">
+                                <h3 class="font-condensed text-2xl font-bold tracking-wider uppercase text-creamText">CAFÉS</h3>
+                                <p class="text-[10px] font-semibold tracking-widest uppercase text-caramelLight">AQUI VOCÊ ENCONTRA OS MELHORES CAFÉS</p>
+                            </div>
+                            <div class="space-y-2.5 text-xs">
+                                <div class="menu-item flex justify-between items-baseline menu-item-dots pb-1">
+                                    <span class="font-bold uppercase">ESPRESSO</span>
+                                    <span class="font-condensed font-semibold text-caramelLight">R$9,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline menu-item-dots pb-1">
+                                    <span class="font-bold uppercase">ESPRESSO DUPLO</span>
+                                    <span class="font-condensed font-semibold text-caramelLight">R$13,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline menu-item-dots pb-1">
+                                    <span class="font-bold uppercase">AMERICANO</span>
+                                    <span class="font-condensed font-semibold text-caramelLight">R$9,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline menu-item-dots pb-1">
+                                    <span class="font-bold uppercase">COADO DO DIA</span>
+                                    <span class="font-condensed font-semibold text-caramelLight">R$9,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline menu-item-dots pb-1">
+                                    <span class="font-bold uppercase">AEROPRESS</span>
+                                    <span class="font-condensed font-semibold text-caramelLight">R$13,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline menu-item-dots pb-1">
+                                    <span class="font-bold uppercase">HARIO V60</span>
+                                    <span class="font-condensed font-semibold text-caramelLight">R$13,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline menu-item-dots pb-1">
+                                    <span class="font-bold uppercase">CLEVER</span>
+                                    <span class="font-condensed font-semibold text-caramelLight">R$13,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline menu-item-dots pb-1">
+                                    <span class="font-bold uppercase">PRENSA FRANCESA</span>
+                                    <span class="font-condensed font-semibold text-caramelLight">R$13,90</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- HOT -->
+                        <div class="bg-espressoCard/85 backdrop-blur-sm border border-caramel/20 p-6 rounded-2xl shadow-lg">
+                            <div class="menu-header-border py-2 mb-4">
+                                <h3 class="font-condensed text-2xl font-bold tracking-wider uppercase text-creamText">HOT</h3>
+                                <p class="text-[10px] font-semibold tracking-wider uppercase text-caramelLight">VOCÊ TEM A OPÇÃO DE ALTERAR O LEITE POR LEITE VEGETAL + R$ 2,00</p>
+                            </div>
+                            <div class="space-y-3.5 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CAPPUCCINO</span>
+                                        <span class="font-condensed text-caramelLight">R$14,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Café espresso e leite cremoso</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>MACCHIATO</span>
+                                        <span class="font-condensed text-caramelLight">R$9,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espresso com espuma de leite</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>FLAT WHITE</span>
+                                        <span class="font-condensed text-caramelLight">R$16,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espresso duplo com leite vaporizado</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>LATTE</span>
+                                        <span class="font-condensed text-caramelLight">R$14,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sabores: Latte, Vanilla e Caramel</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>MOCCHA</span>
+                                        <span class="font-condensed text-caramelLight">R$19,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espresso, leite vaporizado e ganache de chocolate ou Nutella</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>APPLE LATTE</span>
+                                        <span class="font-condensed text-caramelLight">R$19,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espresso, leite vaporizado com maçã e canela</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>NUTELLA LATTE</span>
+                                        <span class="font-condensed text-caramelLight">R$24,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Leite vaporizado com macadâmia, espresso, finalizado com Nutella e nozes</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>HOT CHOCOLATE</span>
+                                        <span class="font-condensed text-caramelLight">R$22,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Feito com chocolate Belga</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CHAI LATTE</span>
+                                        <span class="font-condensed text-caramelLight">R$16,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Chá preto leite vaporizado com especiarias</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>MATCHA LATTE</span>
+                                        <span class="font-condensed text-caramelLight">R$16,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Leite vaporizado com Matcha</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CHÁS ESPECIAIS</span>
+                                        <span class="font-condensed text-caramelLight">R$11,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Consulte as opções</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ICED -->
+                        <div class="bg-espressoCard/85 backdrop-blur-sm border border-caramel/20 p-6 rounded-2xl shadow-lg">
+                            <div class="menu-header-border py-2 mb-4">
+                                <h3 class="font-condensed text-2xl font-bold tracking-wider uppercase text-creamText">ICED</h3>
+                                <p class="text-[10px] font-semibold tracking-wider uppercase text-caramelLight">VOCÊ TEM A OPÇÃO DE ALTERAR O LEITE POR LEITE VEGETAL + R$ 2,00</p>
+                            </div>
+                            <div class="space-y-3.5 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ICED LATTE</span>
+                                        <span class="font-condensed text-caramelLight">R$16,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sabores: Latte, Vanilla e Caramel</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ICED MOCCHA</span>
+                                        <span class="font-condensed text-caramelLight">R$21,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Café, leite gelado e ganache de chocolate</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ICED COFFEE</span>
+                                        <span class="font-condensed text-caramelLight">R$14,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sabores: Vanilla e Caramel</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>MATCHA ICED LATTE</span>
+                                        <span class="font-condensed text-caramelLight">R$17,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Leite com Matcha</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>FRAPPÉ</span>
+                                        <span class="font-condensed text-caramelLight">R$24,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sabores: Café, Chocolate, Morango, Caramelo e Nutella</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ICED CHOCOLATE</span>
+                                        <span class="font-condensed text-caramelLight">R$24,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Feito com chocolate Belga</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ESPRESSO TÔNICA</span>
+                                        <span class="font-condensed text-caramelLight">R$18,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espresso, água tônica, gelo e limão</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CAFÉ PROTEICO</span>
+                                        <span class="font-condensed text-caramelLight">R$24,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Leite, espresso, whey protein (sabores: Vanilla, Chocolate e Morango) e gelo</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUNA 2: BEVERAGES, SUCOS & COCKTAILS -->
+                    <div class="lg:col-span-4 space-y-8 menu-category-block" data-category="beverages">
+                        <!-- BEVERAGES -->
+                        <div class="bg-espressoCard/85 backdrop-blur-sm border border-caramel/20 p-6 rounded-2xl shadow-lg">
+                            <div class="menu-header-border py-2 mb-4">
+                                <h3 class="font-condensed text-2xl font-bold tracking-wider uppercase text-creamText">BEVERAGES</h3>
+                            </div>
+                            <div class="space-y-3.5 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>PINK LEMONADE</span>
+                                        <span class="font-condensed text-caramelLight">R$19,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Limonada batida com cranberry</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ICED TEA</span>
+                                        <span class="font-condensed text-caramelLight">R$18,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sabores: Limão Siciliano, Cranberry, Pêssego e Framboesa</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>REFRIGERANTE</span>
+                                        <span class="font-condensed text-caramelLight">R$10,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Lata 350ml - Consulte opções</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>SODA ITALIANA</span>
+                                        <span class="font-condensed text-caramelLight">R$16,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sabores: Romã, Maçã Verde, Tangerina, Limão Siciliano e Caramelo Salgado</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ÁGUA</span>
+                                        <span class="font-condensed text-caramelLight">R$8,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Com ou sem gás</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ÁGUA TÔNICA</span>
+                                        <span class="font-condensed text-caramelLight">R$10,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Lata 350ml</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>FRENCH LEMONADE</span>
+                                        <span class="font-condensed text-caramelLight">R$19,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Limonada com especiarias. Sabores: Maracujá com Pêssego, Morango com Cranberry e Pera com Canela</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>SAN PELLEGRINO</span>
+                                        <span class="font-condensed text-caramelLight">R$26,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Água mineral italiana com gás</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUCOS -->
+                        <div class="bg-gradient-to-br from-espressoSurface to-espressoCard border border-caramel/40 p-6 rounded-2xl shadow-lg">
+                            <div class="border-b border-caramel/30 pb-2 mb-4 flex justify-between items-center">
+                                <h3 class="font-condensed text-2xl font-bold tracking-wider uppercase text-creamText">SUCOS</h3>
+                                <span class="text-[10px] tracking-widest uppercase text-caramelLight font-semibold">100% Naturais</span>
+                            </div>
+                            <div class="space-y-2.5 text-xs">
+                                <div class="menu-item flex justify-between items-baseline border-b border-creamText/10 pb-1.5">
+                                    <span class="font-bold uppercase tracking-wide">LARANJA</span>
+                                    <span class="font-condensed font-semibold text-sm text-caramelLight">R$18</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline border-b border-creamText/10 pb-1.5">
+                                    <span class="font-bold uppercase tracking-wide">MARACUJÁ & MANGA</span>
+                                    <span class="font-condensed font-semibold text-sm text-caramelLight">R$22</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline border-b border-creamText/10 pb-1.5">
+                                    <span class="font-bold uppercase tracking-wide">MORANGO & AMORA</span>
+                                    <span class="font-condensed font-semibold text-sm text-caramelLight">R$22</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline border-b border-creamText/10 pb-1.5">
+                                    <span class="font-bold uppercase tracking-wide">UVA BORDEAUX & UVA VITÓRIA</span>
+                                    <span class="font-condensed font-semibold text-sm text-caramelLight">R$22</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline pb-1">
+                                    <span class="font-bold uppercase tracking-wide">COUVE + MAÇÃ + GENGIBRE</span>
+                                    <span class="font-condensed font-semibold text-sm text-caramelLight">R$22</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COCKTAILS -->
+                        <div class="bg-espressoCard/85 backdrop-blur-sm border border-caramel/20 p-6 rounded-2xl shadow-lg">
+                            <div class="menu-header-border py-2 mb-4">
+                                <h3 class="font-condensed text-2xl font-bold tracking-wider uppercase text-creamText">COCKTAILS</h3>
+                            </div>
+                            <div class="space-y-3.5 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>APEROL SPRITZ</span>
+                                        <span class="font-condensed text-caramelLight">R$36,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espumante, Aperol e água com gás</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CENTRAL PARK</span>
+                                        <span class="font-condensed text-caramelLight">R$36,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Gin, Tônica e Cranberry</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ESPRESSO GT</span>
+                                        <span class="font-condensed text-caramelLight">R$36,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espresso, gin e tônica</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>MANHATTAN</span>
+                                        <span class="font-condensed text-caramelLight">R$36,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Vermute doce, Bitters e Bourbon</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>MOCACCINO</span>
+                                        <span class="font-condensed text-caramelLight">R$36,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espresso, vodka, baunilha, leite e chocolate</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>SOHO</span>
+                                        <span class="font-condensed text-caramelLight">R$36,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Gin, espumante, tangerina e água com gás</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>BROADWAY</span>
+                                        <span class="font-condensed text-caramelLight">R$36,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espumante rosé, gin, limão e framboesa</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ESPRESSO MARTINI</span>
+                                        <span class="font-condensed text-caramelLight">R$36,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espresso, vodka, licor de café</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>MIMOSA</span>
+                                        <span class="font-condensed text-caramelLight">R$39,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Espumante com suco de laranja</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>NEGRONI</span>
+                                        <span class="font-condensed text-caramelLight">R$36,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Gin, Campari e Vermute</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>SMITH</span>
+                                        <span class="font-condensed text-caramelLight">R$36,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Gin, maracujá, pêssego e Angostura</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>ESPUMANTE</span>
+                                        <span class="font-condensed text-caramelLight">R$110,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Brut ou Rosé</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUNA 3: SWEETS -->
+                    <div class="lg:col-span-4 space-y-8 menu-category-block" data-category="sweets">
+                        <div class="bg-espressoCard/85 backdrop-blur-sm border border-caramel/20 p-6 rounded-2xl shadow-lg">
+                            <div class="menu-header-border py-2 mb-4">
+                                <h3 class="font-condensed text-2xl font-bold tracking-wider uppercase text-creamText">SWEETS</h3>
+                            </div>
+                            <div class="space-y-3.5 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>APPLE PIE</span>
+                                        <span class="font-condensed text-caramelLight">R$19,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Torta de massa fina e recheada de maçã</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CARROT CAKE</span>
+                                        <span class="font-condensed text-caramelLight">R$24,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Feito com cenoura, nozes e especiarias. Coberto e recheado com cream cheese frosting</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>RED VELVET</span>
+                                        <span class="font-condensed text-caramelLight">R$24,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Massa tradicional red velvet, coberta e recheada com cream cheese frosting</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CHOCOLATE CAKE</span>
+                                        <span class="font-condensed text-caramelLight">R$27,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Feito com cacau puro, coberto e recheado com ganache de chocolate Belga. Acompanha ganache de chocolate.</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CHEESECAKE</span>
+                                        <span class="font-condensed text-caramelLight">R$23,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Acompanha calda de frutas vermelhas</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>BROWNIE</span>
+                                        <span class="font-condensed text-caramelLight">R$20,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Feito com chocolate belga e servido com ganache de chocolate</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CROISSANT COM NUTELLA</span>
+                                        <span class="font-condensed text-caramelLight">R$28,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Massa folhada e crocante, recheada com Nutella</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>BROWNIE FUNCIONAL</span>
+                                        <span class="font-condensed text-caramelLight">R$32,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sem glúten e sem lactose. Feito com biomassa de banana verde, tâmara, farinha de arroz, cacau alcalino 100% e chocolate 63%</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CINNAMON ROLL</span>
+                                        <span class="font-condensed text-caramelLight">R$19,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Tradicional pão doce com canela. Acompanha cream cheese frosting</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>FRENCH TOAST CINNAMON</span>
+                                        <span class="font-condensed text-caramelLight">R$23,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Fatia de brioche tostado com toque de baunilha e finalizado com canela</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>WAFFLE</span>
+                                        <span class="font-condensed text-caramelLight">R$22,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Waffle tradicional acompanhado de manteiga e mel</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>AFFOGATO</span>
+                                        <span class="font-condensed text-caramelLight">R$20,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Gelato artesanal servido com espresso</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>COOKIES <span class="font-normal text-[10px]">(2 unidades)</span></span>
+                                        <span class="font-condensed text-caramelLight">a partir de R$16,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Consulte os sabores</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>IOGURTE COM GRANOLA E MEL</span>
+                                        <span class="font-condensed text-caramelLight">R$19,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Iogurte natural integral acompanhado de granola e mel</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>SALADA DE FRUTAS</span>
+                                        <span class="font-condensed text-caramelLight">R$19,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Frutas da estação</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>BRIGADEIRO</span>
+                                        <span class="font-condensed text-caramelLight">R$10,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Consulte os sabores</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>MACARONS</span>
+                                        <span class="font-condensed text-caramelLight">R$9,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Consulte os sabores</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>BOLO DE MAÇÃ</span>
+                                        <span class="font-condensed text-caramelLight">R$24,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sem glúten e sem lactose. Feito com farinha de amêndoas, aveia, nozes, óleo de coco, açúcar mascavo, canela e cobertura de doce de leite.</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 pt-3 border-t border-caramel/20 text-[10px] text-mutedSand leading-relaxed">
+                                <strong class="uppercase text-caramelLight">ATENÇÃO:</strong> Celíacos e alérgicos à canela/APLV: Os itens sem glúten e sem lactose podem conter traços de contaminação cruzada.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PÁGINA 2 DO CARDÁPIO -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-8 border-t border-caramel/30">
+
+                    <!-- COLUNA 1: TNYC BRUNCH R$ 120 -->
+                    <div id="brunch" class="lg:col-span-3 menu-category-block" data-category="brunch">
+                        <div class="bg-gradient-to-b from-espressoSurface to-espressoCard border-2 border-caramel/60 p-6 rounded-2xl shadow-xl">
+                            <div class="flex justify-between items-baseline border-b border-caramel/40 pb-2 mb-4">
+                                <h3 class="font-condensed text-2xl font-bold tracking-wider uppercase text-creamText">TNYC BRUNCH</h3>
+                                <span class="font-condensed text-2xl font-bold text-caramelLight">R$120</span>
+                            </div>
+
+                            <div class="space-y-5 text-xs">
+                                <div>
+                                    <div class="bg-caramel text-espressoBg px-2.5 py-1 rounded font-condensed font-bold tracking-wider uppercase text-xs mb-2">
+                                        WELCOME DRINK <span class="font-normal text-[10px]">(ESCOLHA UM ITEM)</span>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="menu-item">
+                                            <p class="font-bold uppercase">MIMOSA</p>
+                                            <p class="text-mutedSand text-[11px]">Espumante com suco de laranja</p>
+                                        </div>
+                                        <div class="menu-item">
+                                            <p class="font-bold uppercase">SUNSET 02</p>
+                                            <p class="text-mutedSand text-[11px]">Suco de laranja saborizado com romã</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="bg-caramel text-espressoBg px-2.5 py-1 rounded font-condensed font-bold tracking-wider uppercase text-xs mb-2">
+                                        STARTERS <span class="font-normal text-[10px]">(ESCOLHA UM ITEM)</span>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div class="menu-item">
+                                            <p class="font-bold uppercase">PÃO NA CHAPA</p>
+                                            <p class="text-mutedSand text-[11px]">Fatia de brioche tostado com manteiga</p>
+                                        </div>
+                                        <div class="menu-item">
+                                            <p class="font-bold uppercase">FRENCH TOAST CINNAMON</p>
+                                            <p class="text-mutedSand text-[11px]">Fatia de brioche tostado com toque de canela</p>
+                                        </div>
+                                        <div class="menu-item">
+                                            <p class="font-bold uppercase">PANQUECAS COM MANTEIGA E MEL</p>
+                                            <p class="text-mutedSand text-[11px]">Panquecas acompanhadas de manteiga e mel</p>
+                                        </div>
+                                        <div class="menu-item">
+                                            <p class="font-bold uppercase">FRENCH TOAST GARLIC PARMESAN</p>
+                                            <p class="text-mutedSand text-[11px]">Fatia de brioche tostado com toque de alho e parmesão</p>
+                                        </div>
+                                        <div class="menu-item">
+                                            <p class="font-bold uppercase">WAFFLE COM MANTEIGA E MEL</p>
+                                            <p class="text-mutedSand text-[11px]">Waffle tradicional acompanhado de manteiga e mel</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="bg-caramel text-espressoBg px-2.5 py-1 rounded font-condensed font-bold tracking-wider uppercase text-xs mb-2">
+                                        MAIN <span class="font-normal text-[10px]">(ESCOLHA UM ITEM)</span>
+                                    </div>
+                                    <div class="space-y-1.5 font-bold uppercase text-[11px]">
+                                        <p class="menu-item">AVOCADO TOAST</p>
+                                        <p class="menu-item">TORRADA COM OVOS E BACON</p>
+                                        <p class="menu-item">OVOS BENEDITINOS DE PARMA OU SALMÃO</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="bg-caramel text-espressoBg px-2.5 py-1 rounded font-condensed font-bold tracking-wider uppercase text-xs mb-2">
+                                        HAPPY END <span class="font-normal text-[10px]">(BEBIDA + SOBREMESA)</span>
+                                    </div>
+                                    <div class="space-y-1.5 font-bold uppercase text-[11px]">
+                                        <p class="menu-item">CAFÉ <span class="font-normal text-mutedSand">(ESPRESSO OU COADO DO DIA)</span></p>
+                                        <p class="menu-item">BOLO DO DIA <span class="font-normal text-mutedSand">(RED VELVET OU CARROT CAKE)</span></p>
+                                        <p class="menu-item">BROWNIE DE CHOCOLATE</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUNA 2: THE BIG DEAL -->
+                    <div class="lg:col-span-3 menu-category-block" data-category="bigdeal">
+                        <div class="bg-espressoCard/85 backdrop-blur-sm border border-caramel/20 p-6 rounded-2xl shadow-lg">
+                            <div class="menu-header-border py-2 mb-4">
+                                <h3 class="font-condensed text-2xl font-bold tracking-wider uppercase text-creamText">THE BIG DEAL</h3>
+                                <p class="text-[10px] font-semibold tracking-widest uppercase text-caramelLight">VOCÊ NÃO VAI SE ARREPENDER</p>
+                            </div>
+                            <div class="space-y-3.5 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>AVOLOX</span>
+                                        <span class="font-condensed text-caramelLight">R$46,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sanduíche de brioche tostado, avocado, salmão defumado, cream cheese e tomate</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>AVOCADO TOAST</span>
+                                        <span class="font-condensed text-caramelLight">R$40,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Fatia de torrada integral de fermentação natural com avocado e tomates frescos, finalizado com sal, pimenta do reino e raspas de limão</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>AVOCADO TOAST COM OVO</span>
+                                        <span class="font-condensed text-caramelLight">R$43,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Fatia de torrada integral de fermentação natural com avocado e tomates frescos, finalizado com sal, pimenta do reino e raspas de limão. Acompanhado de ovo mexido no ponto ideal</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>BRT</span>
+                                        <span class="font-condensed text-caramelLight">R$37,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sanduíche com torrada integral de fermentação natural, bacon defumado, rúcula e tomate, com um toque de cream cheese e mostarda dijon</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CROQUE MADAME</span>
+                                        <span class="font-condensed text-caramelLight">R$48,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sanduíche no pão de brioche, recheado com queijo, presunto e mostarda, coberto com molho bechamel, gratinado e finalizado com ovo frito</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CROQUE MONSIEUR</span>
+                                        <span class="font-condensed text-caramelLight">R$45,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sanduíche no pão de brioche, recheado com queijo, presunto e mostarda, coberto com molho bechamel, gratinado</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>LOX TOAST</span>
+                                        <span class="font-condensed text-caramelLight">R$42,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Torrada integral de fermentação natural, cream cheese temperado, salmão defumado finalizado com cebolinha e raspas de limão</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>OVOS BENEDITINOS PARMA</span>
+                                        <span class="font-condensed text-caramelLight">R$45,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Fatia de brioche tostado, ovos no ponto perfeito, finalizado com presunto parma e molho hollandaise</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>OVOS BENEDITINOS SALMÃO</span>
+                                        <span class="font-condensed text-caramelLight">R$47,00</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Fatia de brioche tostado, ovos no ponto perfeito, finalizado com salmão defumado e molho hollandaise</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUNA 3: BREADS AND SANDWICHES, SAVORY, COMBOS, SALADAS -->
+                    <div class="lg:col-span-3 space-y-6 menu-category-block" data-category="breads">
+                        <div class="bg-espressoCard/85 backdrop-blur-sm border border-caramel/20 p-6 rounded-2xl shadow-lg">
+                            <div class="menu-header-border py-2 mb-4">
+                                <h3 class="font-condensed text-xl font-bold tracking-wider uppercase text-creamText">BREADS AND SANDWICHES</h3>
+                            </div>
+                            <div class="space-y-3 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CROISSANT</span>
+                                        <span class="font-condensed text-caramelLight">R$18,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Pão de massa folhada. Acompanha manteiga</p>
+                                    <p class="text-[10px] font-semibold text-caramelLight mt-0.5">TIP: Que tal rechear seu croissant com um de nossos adicionais?</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CROISSANT COM BRIE, PARMA E MEL</span>
+                                        <span class="font-condensed text-caramelLight">R$40,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Massa folhada com recheio de queijo brie, presunto parma e mel</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CROISSANT COM CREAM CHEESE, BACON E OVO</span>
+                                        <span class="font-condensed text-caramelLight">R$37,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Massa folhada com recheio de cream cheese, bacon e ovo frito</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>MISTO QUENTE</span>
+                                        <span class="font-condensed text-caramelLight">R$29,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sanduíche no pão de brioche tostado e recheado com presunto e queijo</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>QUEIJO QUENTE</span>
+                                        <span class="font-condensed text-caramelLight">R$32,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sanduíche no pão de brioche tostado e recheado com queijo</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>TOAST</span>
+                                        <span class="font-condensed text-caramelLight">R$11,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Fatia de brioche ou levain multigrãos tostado com manteiga</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>FRENCH TOAST GARLIC PARMESAN</span>
+                                        <span class="font-condensed text-caramelLight">R$24,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Fatia de brioche tostado com toque de alho e queijo parmesão</p>
+                                </div>
+                            </div>
+
+                            <!-- SAVORY -->
+                            <div class="menu-header-border py-1.5 mt-6 mb-3">
+                                <h4 class="font-condensed text-xl font-bold tracking-wider uppercase text-creamText">SAVORY</h4>
+                            </div>
+                            <div class="space-y-3 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>CROSTINI</span>
+                                        <span class="font-condensed text-caramelLight">R$25,00</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Aperitivo feito com brioche tostado, parma, caprese e tomate com cebola roxa</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>OVOS FRITOS, MEXIDOS OU OMELETE</span>
+                                        <span class="font-condensed text-caramelLight">R$13,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Finalizado com sal e pimenta do reino</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>PÃO DE QUEIJO <span class="font-normal text-[10px]">(2 unidades)</span></span>
+                                        <span class="font-condensed text-caramelLight">R$11,90</span>
+                                    </div>
+                                    <p class="text-[10px] font-semibold text-caramelLight">TIP: Que tal rechear seu pão de queijo com um de nossos adicionais?</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>MINI QUICHE DE ALHO PORÓ</span>
+                                        <span class="font-condensed text-caramelLight">R$32,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Sem glúten e sem lactose. Feito com farinha de linhaça, farinha de arroz integral, ovos, manteiga ghee e creme de ricota</p>
+                                </div>
+                            </div>
+
+                            <!-- COMBOS -->
+                            <div class="menu-header-border py-1.5 mt-6 mb-3">
+                                <h4 class="font-condensed text-xl font-bold tracking-wider uppercase text-creamText">COMBOS</h4>
+                            </div>
+                            <div class="space-y-3 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>TNYC BREAKFAST</span>
+                                        <span class="font-condensed text-caramelLight">R$39,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Avocado, tomates frescos, rúcula e ovos mexidos. Acompanha suco de laranja</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>TNYC SNACK</span>
+                                        <span class="font-condensed text-caramelLight">R$40,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Fatia de brioche na chapa, ovos mexidos e bacon defumado. Acompanha coado do dia</p>
+                                </div>
+                            </div>
+
+                            <!-- SALADAS -->
+                            <div class="menu-header-border py-1.5 mt-6 mb-3">
+                                <h4 class="font-condensed text-xl font-bold tracking-wider uppercase text-creamText">SALADAS</h4>
+                            </div>
+                            <div class="space-y-3 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>SALADA DA CASA</span>
+                                        <span class="font-condensed text-caramelLight">R$32,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Alface crespa, rúcula, avocado, tomate cereja, nozes. Escolha entre salmão defumado ou presunto parma. Acompanha molho de mostarda</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>SALADA TROPICAL</span>
+                                        <span class="font-condensed text-caramelLight">R$32,50</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Alface crespa, rúcula, manga, gengibre, nozes. Escolha entre salmão defumado ou presunto parma. Acompanha molho de iogurte</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUNA 4: FAMILY STYLE DESSERTS, TOPPINGS, TNYC MARKET -->
+                    <div class="lg:col-span-3 space-y-6 menu-category-block" data-category="desserts">
+                        <div class="bg-espressoCard/85 backdrop-blur-sm border border-caramel/20 p-6 rounded-2xl shadow-lg">
+                            <div class="menu-header-border py-2 mb-4">
+                                <h3 class="font-condensed text-xl font-bold tracking-wider uppercase text-creamText">FAMILY STYLE DESSERTS</h3>
+                            </div>
+                            <div class="space-y-3 text-xs">
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>BROWNIE COM GELATO</span>
+                                        <span class="font-condensed text-caramelLight">R$34,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Feito com chocolate belga. Acompanha gelato e ganache de chocolate</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>PANQUECAS AMERICANAS</span>
+                                        <span class="font-condensed text-caramelLight">R$27,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Panquecas tradicionais acompanhadas de manteiga e mel</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>PANQUECAS COM CHOCOLATE E FRUTAS</span>
+                                        <span class="font-condensed text-caramelLight">R$34,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Panquecas tradicionais acompanhadas de frutas frescas e ganache de chocolate</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>TOSTADO DE DOCE DE LEITE</span>
+                                        <span class="font-condensed text-caramelLight">R$26,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Feito com brioche tostado e recheio de doce de leite</p>
+                                </div>
+                                <div class="menu-item">
+                                    <div class="flex justify-between font-bold uppercase">
+                                        <span>WAFFLE COM GELATO E FRUTAS</span>
+                                        <span class="font-condensed text-caramelLight">R$35,90</span>
+                                    </div>
+                                    <p class="text-mutedSand text-[11px] leading-snug">Waffle tradicional servido com gelato e nossa compota de frutas vermelhas</p>
+                                </div>
+                            </div>
+
+                            <!-- TOPPINGS -->
+                            <div class="menu-header-border py-1.5 mt-6 mb-3">
+                                <h4 class="font-condensed text-xl font-bold tracking-wider uppercase text-creamText">TOPPINGS</h4>
+                            </div>
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[11px]">
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">AVOCADO</span>
+                                    <span class="font-condensed text-caramelLight">R$12,50</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">RÚCULA</span>
+                                    <span class="font-condensed text-caramelLight">R$3,00</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">CREAM CHEESE</span>
+                                    <span class="font-condensed text-caramelLight">R$7,50</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">NUTELLA</span>
+                                    <span class="font-condensed text-caramelLight">R$10,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">QUEIJO BRIE</span>
+                                    <span class="font-condensed text-caramelLight">R$14,00</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">DOCE DE LEITE</span>
+                                    <span class="font-condensed text-caramelLight">R$7,50</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">QUEIJO</span>
+                                    <span class="font-condensed text-caramelLight">R$8,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">GRANOLA</span>
+                                    <span class="font-condensed text-caramelLight">R$3,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">BACON</span>
+                                    <span class="font-condensed text-caramelLight">R$10,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">MEL</span>
+                                    <span class="font-condensed text-caramelLight">R$5,00</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">TOMATE</span>
+                                    <span class="font-condensed text-caramelLight">R$4,50</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">BOLA DE GELATO</span>
+                                    <span class="font-condensed text-caramelLight">R$10,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">MANTEIGA</span>
+                                    <span class="font-condensed text-caramelLight">R$4,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase leading-tight">COMPOTA FRUTAS VERMELHAS</span>
+                                    <span class="font-condensed text-caramelLight">R$8,50</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">SALMÃO</span>
+                                    <span class="font-condensed text-caramelLight">R$17,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">MAPLE SYRUP</span>
+                                    <span class="font-condensed text-caramelLight">R$9,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">PRESUNTO PARMA</span>
+                                    <span class="font-condensed text-caramelLight">R$14,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">LEITE</span>
+                                    <span class="font-condensed text-caramelLight">R$3,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">PRESUNTO</span>
+                                    <span class="font-condensed text-caramelLight">R$8,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">LEITE DE AVEIA</span>
+                                    <span class="font-condensed text-caramelLight">R$4,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">OVO</span>
+                                    <span class="font-condensed text-caramelLight">R$6,90</span>
+                                </div>
+                                <div class="menu-item flex justify-between border-b border-creamText/10 pb-0.5">
+                                    <span class="font-bold uppercase">SHOT ALCOÓLICO</span>
+                                    <span class="font-condensed text-caramelLight">R$15,00</span>
+                                </div>
+                                <div class="menu-item flex justify-between pb-0.5">
+                                    <span class="font-bold uppercase">FRUTAS</span>
+                                    <span class="font-condensed text-caramelLight">R$10,50</span>
+                                </div>
+                            </div>
+
+                            <!-- TNYC MARKET -->
+                            <div class="menu-header-border py-1.5 mt-6 mb-3">
+                                <h4 class="font-condensed text-xl font-bold tracking-wider uppercase text-creamText">TNYC MARKET</h4>
+                            </div>
+                            <div class="space-y-2 text-xs">
+                                <div class="menu-item flex justify-between font-bold uppercase">
+                                    <span>PÃO BRIOCHE</span>
+                                    <span class="font-condensed text-caramelLight">R$32,50</span>
+                                </div>
+                                <div class="menu-item flex justify-between font-bold uppercase">
+                                    <span>PÃO LEVAIN MULTIGRÃOS</span>
+                                    <span class="font-condensed text-caramelLight">R$47,50</span>
+                                </div>
+                                <div class="menu-item flex justify-between font-bold uppercase">
+                                    <span>CAFÉ EM GRÃO</span>
+                                    <span class="font-condensed text-caramelLight">R$50,00</span>
+                                </div>
+                                <div class="menu-item flex justify-between items-baseline font-bold uppercase">
+                                    <span>CANECA</span>
+                                    <span class="font-condensed text-[11px] text-caramelLight">(P) R$39,90 | (M) R$49,90 | (G) R$59,90</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Mensagem caso a busca não encontre nada -->
+                <div id="no-results" class="hidden text-center py-12 bg-espressoCard rounded-2xl border border-caramel/25">
+                    <p class="font-editorial text-2xl text-creamText">Nenhum item encontrado com esse termo.</p>
+                    <p class="text-xs text-mutedSand mt-1">Tente buscar por outro ingrediente ou limpe o filtro acima.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- SEÇÃO 5: FAIXA DE BENEFÍCIOS & UNIDADES OFICIAIS                      -->
+    <!-- ===================================================================== -->
+    <section id="unidades" class="relative z-10 py-16 sm:py-20 bg-espressoCard/75 backdrop-blur-md border-t border-caramel/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Barra de 4 Diferenciais igual à referência -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16 bg-espressoSurface/80 border border-caramel/25 p-5 rounded-2xl">
+                <div class="flex items-center gap-3.5 p-2">
+                    <div class="w-10 h-10 rounded-xl bg-caramel/15 border border-caramel/40 flex items-center justify-center text-caramelLight shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-creamText">All-Day Brunch</p>
+                        <p class="text-[11px] text-mutedSand">Servido todos os dias</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3.5 p-2">
+                    <div class="w-10 h-10 rounded-xl bg-caramel/15 border border-caramel/40 flex items-center justify-center text-caramelLight shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-creamText">Fresh & Artisanal</p>
+                        <p class="text-[11px] text-mutedSand">Preparado na hora</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3.5 p-2">
+                    <div class="w-10 h-10 rounded-xl bg-caramel/15 border border-caramel/40 flex items-center justify-center text-caramelLight shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-creamText">Delivery & Take Away</p>
+                        <p class="text-[11px] text-mutedSand">Peça pelo WhatsApp</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3.5 p-2">
+                    <div class="w-10 h-10 rounded-xl bg-caramel/15 border border-caramel/40 flex items-center justify-center text-caramelLight shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-creamText">3 Unidades Exclusivas</p>
+                        <p class="text-[11px] text-mutedSand">Alphaville, ATC & Perdizes</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center max-w-2xl mx-auto mb-12 space-y-2">
+                <p class="font-editorial italic text-xl text-caramelLight">Visit Us</p>
+                <h2 class="font-editorial text-4xl sm:text-5xl font-semibold text-creamText">Nossas Unidades & Contatos</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+                
+                <!-- UNIDADE 1: ALPHAVILLE - RIO NEGRO -->
+                <div class="bg-espressoBg border border-caramel/25 p-7 rounded-2xl shadow-lg flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 bg-caramel text-espressoBg rounded">Unidade Principal</span>
+                            <h3 class="font-editorial text-2xl font-semibold mt-3 text-creamText">Alphaville — Rio Negro</h3>
+                        </div>
+                        
+                        <div class="space-y-3 text-xs text-mutedSand border-t border-caramel/15 pt-4">
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Endereço:</span>
+                                <span>Alameda Rio Negro, 1030 — Alphaville Empresarial, Barueri - SP, CEP 06454-000</span>
+                            </p>
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Horário:</span>
+                                <span>Segunda a Domingo: <strong class="text-creamText">08h às 20h</strong></span>
+                            </p>
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Telefone:</span>
+                                <a href="tel:+551141956222" class="text-creamText font-bold underline hover:text-caramelLight">(11) 4195-6222</a>
+                            </p>
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">WhatsApp:</span>
+                                <a href="tel:+5511914081968" class="text-creamText font-bold underline hover:text-caramelLight">(11) 91408-1968</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                        <a href="tel:+551141956222" class="flex-1 text-center py-2.5 px-3 bg-caramel text-espressoBg font-semibold text-xs tracking-wider uppercase rounded-lg hover:bg-caramelLight transition">
+                            Ligar Agora
+                        </a>
+                        <button onclick="copyText('(11) 4195-6222', 'Telefone Alphaville copiado!')" class="py-2.5 px-3 border border-caramel/35 text-creamText font-semibold text-xs tracking-wider uppercase rounded-lg hover:bg-espressoSurface transition">
+                            Copiar Nº
+                        </button>
+                    </div>
+                </div>
+
+                <!-- UNIDADE 2: ATC - ALPHAVILLE TÊNIS CLUBE -->
+                <div class="bg-espressoBg border border-caramel/25 p-7 rounded-2xl shadow-lg flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 bg-caramel/20 border border-caramel/50 text-caramelLight rounded">Clube & Lazer</span>
+                            <h3 class="font-editorial text-2xl font-semibold mt-3 text-creamText">ATC — Alphaville Tênis Clube</h3>
+                        </div>
+                        
+                        <div class="space-y-3 text-xs text-mutedSand border-t border-caramel/15 pt-4">
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Endereço:</span>
+                                <span>Alameda Paris, 555 (Anexo 2 / Área Gastronômica ATC) — Alphaville Residencial Um, Barueri - SP</span>
+                            </p>
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Horário:</span>
+                                <span>Todos os dias: <strong class="text-creamText">08h às 18h</strong></span>
+                            </p>
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Telefone:</span>
+                                <a href="tel:+551121882700" class="text-creamText font-bold underline hover:text-caramelLight">(11) 2188-2700</a>
+                            </p>
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Clube ATC:</span>
+                                <a href="tel:+551121882652" class="text-creamText font-bold underline hover:text-caramelLight">(11) 2188-2652</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                        <a href="tel:+551121882700" class="flex-1 text-center py-2.5 px-3 bg-caramel text-espressoBg font-semibold text-xs tracking-wider uppercase rounded-lg hover:bg-caramelLight transition">
+                            Ligar Agora
+                        </a>
+                        <button onclick="copyText('(11) 2188-2700', 'Telefone ATC copiado!')" class="py-2.5 px-3 border border-caramel/35 text-creamText font-semibold text-xs tracking-wider uppercase rounded-lg hover:bg-espressoSurface transition">
+                            Copiar Nº
+                        </button>
+                    </div>
+                </div>
+
+                <!-- UNIDADE 3: PERDIZES - SÃO PAULO -->
+                <div class="bg-espressoBg border border-caramel/25 p-7 rounded-2xl shadow-lg flex flex-col justify-between space-y-6">
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 bg-caramel text-espressoBg rounded">São Paulo Capital</span>
+                            <h3 class="font-editorial text-2xl font-semibold mt-3 text-creamText">Perdizes — São Paulo</h3>
+                        </div>
+                        
+                        <div class="space-y-3 text-xs text-mutedSand border-t border-caramel/15 pt-4">
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Endereço:</span>
+                                <span>Rua Monte Alegre, 1142 — Perdizes, São Paulo - SP, CEP 05014-001</span>
+                            </p>
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Horário:</span>
+                                <span>Segunda a Domingo: <strong class="text-creamText">08h às 20h</strong></span>
+                            </p>
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Telefone:</span>
+                                <a href="tel:+551138733379" class="text-creamText font-bold underline hover:text-caramelLight">(11) 3873-3379</a>
+                            </p>
+                            <p class="flex items-start gap-2.5">
+                                <span class="font-bold text-caramelLight uppercase min-w-[72px]">Instagram:</span>
+                                <a href="https://instagram.com/thenewyorkcoffee" target="_blank" rel="noopener noreferrer" class="text-creamText font-bold underline hover:text-caramelLight">@thenewyorkcoffee</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                        <a href="tel:+551138733379" class="flex-1 text-center py-2.5 px-3 bg-caramel text-espressoBg font-semibold text-xs tracking-wider uppercase rounded-lg hover:bg-caramelLight transition">
+                            Ligar Agora
+                        </a>
+                        <button onclick="copyText('(11) 3873-3379', 'Telefone Perdizes copiado!')" class="py-2.5 px-3 border border-caramel/35 text-creamText font-semibold text-xs tracking-wider uppercase rounded-lg hover:bg-espressoSurface transition">
+                            Copiar Nº
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- RODAPÉ COMPLETO ESTILO REFERÊNCIA (4 COLUNAS + NEWSLETTER)            -->
+    <!-- ===================================================================== -->
+    <footer class="relative z-10 bg-espressoBg text-mutedSand pt-16 pb-10 border-t border-caramel/20 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-caramel/15">
+                
+                <!-- Coluna 1: Stay in the Loop -->
+                <div class="lg:col-span-4 space-y-4">
+                    <h4 class="font-editorial text-2xl font-semibold text-creamText">Stay in the Loop</h4>
+                    <p class="text-xs text-mutedSand leading-relaxed">
+                        Receba novidades do menu sazonal, convites para brunchs especiais e novidades da The New York Coffee®.
+                    </p>
+                    <form onsubmit="event.preventDefault(); showToast('Inscrição realizada com sucesso!'); this.reset();" class="flex items-center gap-2 max-w-sm">
+                        <input type="email" required placeholder="Seu melhor e-mail" class="flex-1 bg-espressoCard border border-caramel/30 rounded-lg px-3.5 py-2.5 text-xs text-creamText focus:outline-none focus:border-caramel">
+                        <button type="submit" class="px-4 py-2.5 bg-caramel text-espressoBg font-bold rounded-lg hover:bg-caramelLight transition">&rarr;</button>
+                    </form>
+                    <div class="pt-2 flex items-center gap-3">
+                        <span class="text-[11px] uppercase tracking-wider text-creamText/70">Siga-nos:</span>
+                        <a href="https://instagram.com/thenewyorkcoffee" target="_blank" rel="noopener noreferrer" class="text-caramelLight hover:underline font-semibold">@thenewyorkcoffee</a>
+                        <span>&bull;</span>
+                        <a href="https://linktr.ee/tnyc" target="_blank" rel="noopener noreferrer" class="text-caramelLight hover:underline font-semibold">linktr.ee/tnyc</a>
+                    </div>
+                </div>
+
+                <!-- Coluna 2: Links Rápidos -->
+                <div class="lg:col-span-2 space-y-3">
+                    <h5 class="font-semibold text-creamText uppercase tracking-wider text-xs">Links Rápidos</h5>
+                    <ul class="space-y-2">
+                        <li><a href="#inicio" class="hover:text-caramelLight transition">Início</a></li>
+                        <li><a href="#sobre" class="hover:text-caramelLight transition">Nossa História</a></li>
+                        <li><a href="#destaques" class="hover:text-caramelLight transition">Popular Picks</a></li>
+                        <li><a href="#cardapio" class="hover:text-caramelLight transition">Cardápio Completo</a></li>
+                        <li><a href="#brunch" class="hover:text-caramelLight transition">TNYC Brunch</a></li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 3: Categorias do Menu -->
+                <div class="lg:col-span-3 space-y-3">
+                    <h5 class="font-semibold text-creamText uppercase tracking-wider text-xs">Cardápio Oficial</h5>
+                    <ul class="space-y-2">
+                        <li><a href="#cardapio" class="hover:text-caramelLight transition">Cafés Especiais & Filtrados</a></li>
+                        <li><a href="#cardapio" class="hover:text-caramelLight transition">The Big Deal & Sandwiches</a></li>
+                        <li><a href="#cardapio" class="hover:text-caramelLight transition">Sweets & Family Desserts</a></li>
+                        <li><a href="#cardapio" class="hover:text-caramelLight transition">Cocktails & Beverages</a></li>
+                        <li><a href="#cardapio" class="hover:text-caramelLight transition">TNYC Market</a></li>
+                    </ul>
+                </div>
+
+                <!-- Coluna 4: Contact Us -->
+                <div class="lg:col-span-3 space-y-3">
+                    <h5 class="font-semibold text-creamText uppercase tracking-wider text-xs">Contato & Unidades</h5>
+                    <ul class="space-y-2.5">
+                        <li class="flex items-center gap-2">
+                            <span class="text-caramelLight">&#9742;</span>
+                            <span>Alphaville: <strong class="text-creamText">(11) 4195-6222</strong></span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-caramelLight">&#9742;</span>
+                            <span>WhatsApp: <strong class="text-creamText">(11) 91408-1968</strong></span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-caramelLight">&#9742;</span>
+                            <span>ATC: <strong class="text-creamText">(11) 2188-2700</strong></span>
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-caramelLight">&#9742;</span>
+                            <span>Perdizes: <strong class="text-creamText">(11) 3873-3379</strong></span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-[11px] text-mutedSand/70">
+                <span>&copy; 2026 The New York Coffee®. Todos os direitos reservados.</span>
+                <span>It's Always Coffee Time &bull; Alphaville &bull; ATC &bull; Perdizes</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modal da Comanda Interativa para Pedido no WhatsApp -->
+    <div id="comanda-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-espressoCard border border-caramel/40 rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-caramel/20 pb-3">
+                <h3 class="font-editorial text-2xl font-semibold text-creamText">Sua Comanda TNYC</h3>
+                <button onclick="closeComandaModal()" class="text-mutedSand hover:text-creamText text-lg">&times;</button>
+            </div>
+            <div id="comanda-items" class="max-h-60 overflow-y-auto space-y-2 text-xs">
+                <p class="text-mutedSand text-center py-6">Clique em qualquer item do cardápio para adicionar aqui.</p>
+            </div>
+            <div class="border-t border-caramel/20 pt-3 flex justify-between items-center font-bold text-sm">
+                <span>Total Estimado:</span>
+                <span id="comanda-total" class="font-condensed text-lg text-caramelLight">R$ 0,00</span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="clearComanda()" class="px-4 py-2.5 border border-caramel/30 rounded-lg text-xs uppercase font-semibold hover:bg-espressoSurface">Limpar</button>
+                <button onclick="sendComandaWhatsApp()" class="flex-1 py-2.5 bg-caramel text-espressoBg rounded-lg text-xs uppercase font-bold hover:bg-caramelLight transition">Enviar Pedido no WhatsApp</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificação Flutuante (Toast) -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 bg-caramel text-espressoBg px-4 py-3 rounded-xl shadow-xl text-xs font-bold tracking-wider uppercase transform translate-y-20 opacity-0 transition-all duration-300">
+        Copiado!
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Menu Mobile Toggle
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        });
+
+        // Toast Helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 2600);
+        }
+
+        // Copiar telefone
+        function copyText(text, message) {
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            showToast(message);
+        }
+
+        // Comanda Interativa ao clicar nos itens do cardápio
+        let comanda = [];
+
+        function addToComanda(name, price) {
+            comanda.push({ name, price });
+            updateComandaUI();
+            showToast(`+ ${name} adicionado à comanda`);
+        }
+
+        function clearComanda() {
+            comanda = [];
+            updateComandaUI();
+        }
+
+        function updateComandaUI() {
+            document.getElementById('comanda-badge').textContent = comanda.length;
+            const list = document.getElementById('comanda-items');
+            const totalEl = document.getElementById('comanda-total');
+
+            if (comanda.length === 0) {
+                list.innerHTML = '<p class="text-mutedSand text-center py-6">Clique em qualquer item do cardápio para adicionar aqui.</p>';
+                totalEl.textContent = 'R$ 0,00';
+                return;
+            }
+
+            let total = 0;
+            list.innerHTML = comanda.map((item, idx) => {
+                total += item.price;
+                return `
+                    <div class="flex justify-between items-center bg-espressoBg/70 px-3 py-2 rounded-lg border border-caramel/15">
+                        <span class="font-medium text-creamText">${item.name}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="font-condensed text-caramelLight">R$${item.price.toFixed(2).replace('.', ',')}</span>
+                            <button onclick="comanda.splice(${idx}, 1); updateComandaUI();" class="text-mutedSand hover:text-red-400 font-bold">&times;</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            totalEl.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+        }
+
+        function openComandaModal() {
+            document.getElementById('comanda-modal').classList.remove('hidden');
+        }
+        function closeComandaModal() {
+            document.getElementById('comanda-modal').classList.add('hidden');
+        }
+
+        function sendComandaWhatsApp() {
+            if (comanda.length === 0) {
+                showToast('Adicione pelo menos um item primeiro!');
+                return;
+            }
+            const lines = comanda.map(i => `• ${i.name} (R$${i.price.toFixed(2).replace('.', ',')})`).join('%0A');
+            const total = comanda.reduce((acc, i) => acc + i.price, 0).toFixed(2).replace('.', ',');
+            const msg = `Olá, The New York Coffee! Gostaria de pedir:%0A%0A${lines}%0A%0A*Total estimado: R$${total}*`;
+            window.open(`https://wa.me/5511914081968?text=${msg}`, '_blank');
+        }
+
+        // Tornar todos os itens do cardápio clicáveis para adicionar à comanda
+        document.querySelectorAll('#menu-container .menu-item').forEach(el => {
+            el.classList.add('cursor-pointer', 'hover:bg-caramel/10', 'px-2', 'py-1', '-mx-2', 'rounded-lg', 'transition');
+            el.addEventListener('click', () => {
+                const titleEl = el.querySelector('span:first-child') || el.querySelector('p:first-child');
+                const priceEl = el.querySelector('.font-condensed');
+                if (!titleEl) return;
+                const name = titleEl.textContent.trim();
+                let price = 0;
+                if (priceEl) {
+                    const match = priceEl.textContent.match(/(\d+)[,.](\d+)/);
+                    if (match) price = parseFloat(`${match[1]}.${match[2]}`);
+                    else {
+                        const intMatch = priceEl.textContent.match(/(\d+)/);
+                        if (intMatch) price = parseFloat(intMatch[1]);
+                    }
+                }
+                addToComanda(name, price);
+            });
+        });
+
+        // Filtro por Categoria e Busca em Tempo Real no Cardápio
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const categoryBlocks = document.querySelectorAll('.menu-category-block');
+        const searchInput = document.getElementById('menu-search');
+        const noResults = document.getElementById('no-results');
+
+        let activeFilter = 'all';
+
+        function applyFilters() {
+            const query = searchInput.value.toLowerCase().trim();
+            let visibleBlocks = 0;
+
+            categoryBlocks.forEach(block => {
+                const category = block.getAttribute('data-category');
+                const matchesCategory = (activeFilter === 'all' || category === activeFilter);
+                
+                if (!matchesCategory) {
+                    block.classList.add('hidden');
+                    return;
+                }
+
+                const items = block.querySelectorAll('.menu-item');
+                let hasVisibleItem = false;
+
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if (query === '' || text.includes(query)) {
+                        item.classList.remove('hidden');
+                        hasVisibleItem = true;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+
+                if (hasVisibleItem) {
+                    block.classList.remove('hidden');
+                    visibleBlocks++;
+                } else {
+                    block.classList.add('hidden');
+                }
+            });
+
+            noResults.classList.toggle('hidden', visibleBlocks > 0);
+        }
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('bg-caramel', 'text-espressoBg', 'font-bold');
+                    b.classList.add('border', 'border-caramel/30', 'text-creamText');
+                });
+                btn.classList.add('bg-caramel', 'text-espressoBg', 'font-bold');
+                btn.classList.remove('border', 'border-caramel/30', 'text-creamText');
+
+                activeFilter = btn.getAttribute('data-filter');
+                applyFilters();
+            });
+        });
+
+        searchInput.addEventListener('input', applyFilters);
+
+        // =========================================================================
+        // CENA 3D INTERATIVA COM ROLAGEM (THREE.JS) — XÍCARA TNYC & GRÃOS DE CAFÉ
+        // =========================================================================
+        function initThreeScrollScene() {
+            const container = document.getElementById('three-scroll-container');
+            if (!container || typeof THREE === 'undefined') return;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 0.4, 7.8);
+
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffe9d2, 0.65);
+            scene.add(ambientLight);
+
+            const keyLight = new THREE.DirectionalLight(0xffd7ad, 1.35);
+            keyLight.position.set(5, 8, 6);
+            scene.add(keyLight);
+
+            const rimLight = new THREE.DirectionalLight(0xA67B5B, 0.95);
+            rimLight.position.set(-6, -3, 4);
+            scene.add(rimLight);
+
+            const heroGroup = new THREE.Group();
+            scene.add(heroGroup);
+
+            const cupMat = new THREE.MeshStandardMaterial({
+                color: 0x1D1510,
+                roughness: 0.25,
+                metalness: 0.2
+            });
+            const goldRimMat = new THREE.MeshStandardMaterial({
+                color: 0xC89D7C,
+                roughness: 0.25,
+                metalness: 0.85
+            });
+            const coffeeLiquidMat = new THREE.MeshStandardMaterial({
+                color: 0x5A351E,
+                roughness: 0.2,
+                metalness: 0.1
+            });
+            const saucerMat = new THREE.MeshStandardMaterial({
+                color: 0x261B14,
+                roughness: 0.35,
+                metalness: 0.15
+            });
+
+            const cupPoints = [
+                new THREE.Vector2(0.0, -0.85),
+                new THREE.Vector2(0.62, -0.85),
+                new THREE.Vector2(0.75, -0.65),
+                new THREE.Vector2(0.95, 0.15),
+                new THREE.Vector2(1.02, 0.65),
+                new THREE.Vector2(0.94, 0.65),
+                new THREE.Vector2(0.86, 0.15),
+                new THREE.Vector2(0.66, -0.62),
+                new THREE.Vector2(0.0, -0.62)
+            ];
+            const cupMesh = new THREE.Mesh(new THREE.LatheGeometry(cupPoints, 48), cupMat);
+            heroGroup.add(cupMesh);
+
+            const rimMesh = new THREE.Mesh(new THREE.TorusGeometry(0.98, 0.032, 16, 48), goldRimMat);
+            rimMesh.rotation.x = Math.PI / 2;
+            rimMesh.position.y = 0.65;
+            heroGroup.add(rimMesh);
+
+            const coffeeMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.91, 0.88, 0.06, 40), coffeeLiquidMat);
+            coffeeMesh.position.y = 0.48;
+            heroGroup.add(coffeeMesh);
+
+            const handleMesh = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.075, 16, 32, Math.PI * 1.15), cupMat);
+            handleMesh.position.set(0.95, -0.05, 0);
+            handleMesh.rotation.z = -Math.PI / 2.2;
+            heroGroup.add(handleMesh);
+
+            const saucerPoints = [
+                new THREE.Vector2(0.0, -0.96),
+                new THREE.Vector2(0.85, -0.96),
+                new THREE.Vector2(1.48, -0.78),
+                new THREE.Vector2(1.52, -0.73),
+                new THREE.Vector2(0.82, -0.88),
+                new THREE.Vector2(0.0, -0.88)
+            ];
+            const saucerMesh = new THREE.Mesh(new THREE.LatheGeometry(saucerPoints, 48), saucerMat);
+            heroGroup.add(saucerMesh);
+
+            const beansGroup = new THREE.Group();
+            scene.add(beansGroup);
+
+            const beanMat = new THREE.MeshStandardMaterial({ color: 0x3A2214, roughness: 0.45, metalness: 0.15 });
+            const goldBeanMat = new THREE.MeshStandardMaterial({ color: 0xA67B5B, roughness: 0.3, metalness: 0.7 });
+
+            const beans = [];
+            const beanGeo = new THREE.SphereGeometry(0.14, 18, 14);
+            beanGeo.scale(1.0, 1.38, 0.72);
+
+            for (let i = 0; i < 24; i++) {
+                const bean = new THREE.Mesh(beanGeo, i % 4 === 0 ? goldBeanMat : beanMat);
+                const angle = (i / 24) * Math.PI * 2;
+                const radius = 2.7 + (i % 4) * 0.85;
+                bean.position.set(Math.cos(angle) * radius, ((i % 7) - 3) * 1.15, Math.sin(angle) * 2.2 - 1.2);
+                bean.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+                beansGroup.add(bean);
+                beans.push({ mesh: bean, baseY: bean.position.y, speed: 0.4 + (i % 5) * 0.15, offset: i * 0.7 });
+            }
+
+            let targetScroll = window.scrollY;
+            let currentScroll = window.scrollY;
+            window.addEventListener('scroll', () => { targetScroll = window.scrollY; }, { passive: true });
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            const clock = new THREE.Clock();
+            function animate() {
+                requestAnimationFrame(animate);
+                const elapsed = clock.getElapsedTime();
+
+                currentScroll += (targetScroll - currentScroll) * 0.06;
+                const maxScroll = Math.max(document.body.scrollHeight - window.innerHeight, 1);
+                const scrollProgress = currentScroll / maxScroll;
+
+                const isMobile = window.innerWidth < 768;
+                heroGroup.position.x = Math.sin(scrollProgress * Math.PI * 2.5) * (isMobile ? 1.15 : 2.95);
+                heroGroup.position.y = Math.sin(elapsed * 1.2) * 0.12 - (scrollProgress * 0.4 - 0.2);
+                heroGroup.rotation.y = scrollProgress * Math.PI * 4 + elapsed * 0.25;
+                heroGroup.rotation.x = 0.28 + Math.sin(scrollProgress * Math.PI * 2) * 0.22;
+                heroGroup.rotation.z = Math.cos(scrollProgress * Math.PI * 2) * 0.15;
+
+                beansGroup.rotation.y = scrollProgress * Math.PI * 2.2 + elapsed * 0.08;
+                beansGroup.position.y = (scrollProgress - 0.5) * 2.4;
+
+                beans.forEach((b) => {
+                    b.mesh.position.y = b.baseY + Math.sin(elapsed * b.speed + b.offset) * 0.18;
+                    b.mesh.rotation.x += 0.008;
+                    b.mesh.rotation.y += 0.01;
+                });
+
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        window.addEventListener('load', initThreeScrollScene);
+    </script>
+</body>
+</html>
